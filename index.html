@@ -16,10 +16,14 @@
             <div class="row justify-content-between">
                 <div class="col">
                     <div class="row align-items-center flex-nowrap justify-content-center p-1">
-                        <h5 class="w-auto" style="margin-left:11px;">NEPSE &nbsp; <i class="bi text-secondary" id="nepseIcon"></i></h5>
-                        <small class="w-auto " style="font-size: medium; margin-top: -7px; margin-left: -14px;" id="latest_price"> 0.00</small>
-                        <span style="font-size: small; margin-top: -7px; margin-left: -14px;" class="w-auto text-secondary" id="percentage_change">0.00%</span>
-                        <span style="font-size: small; margin-top: -7px; margin-left: -14px;" class="w-auto text-secondary" id="point_change">0.00</span>
+                        <h5 class="w-auto" style="margin-left:11px;">NEPSE &nbsp; <i class="bi text-secondary"
+                                id="nepseIcon"></i></h5>
+                        <small class="w-auto " style="font-size: medium; margin-top: -7px; margin-left: -14px;"
+                            id="latest_price"> 0.00</small>
+                        <span style="font-size: small; margin-top: -7px; margin-left: -14px;"
+                            class="w-auto text-secondary" id="percentage_change">0.00%</span>
+                        <span style="font-size: small; margin-top: -7px; margin-left: -14px;"
+                            class="w-auto text-secondary" id="point_change">0.00</span>
                     </div>
                 </div>
                 <div class="col">
@@ -31,14 +35,45 @@
             </div>
 
             <div class="row">
+                <div class="col-12 mb-3">
+                    <a href="#" class="text-center d-block bg-body-secondary p-1 text-primary"> Watch List <i
+                            class="bi bi-plus-circle"></i> </a>
+                </div>
+                <div class="col">
+                    <div class="row g-3 align-items-center mb-3">
+                        <div class="col-3">
+                            <input type="text" id="script" class="form-control form-control-sm w-100" placeholder="Script">
+                        </div>
+                        <div class="col-3">
+                            <select class="form-control form-control-sm w-100" id="actionType">
+                                <option selected value="Sell">Sell</option>
+                                <option value="Buy">Buy</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <input type="number" class="form-control form-control-sm w-100" id="price" placeholder="Price">
+                        </div>
+                        <div class="col-2">
+                            <button type="button" id="addScript" class="btn btn-success btn-sm d-block w-100" placeholder="Price"> Add
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-12" id="watchListList"> </div>    
+                    <div class="col">
+                        <hr/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-4">
                     <div class="alert alert-success p-0">
-                        <p class="text-center p-1 m-0"><strong id="advance">0</strong> <br><small>Advanced</small></p>
+                        <p class="text-center p-1 m-0"><strong id="advance">0</strong> <br><small>Positive</small></p>
                     </div>
                 </div>
                 <div class="col-4">
                     <div class="alert alert-danger p-0">
-                        <p class="text-center p-1 m-0"><strong id="decline">0</strong> <br><small>Decline</small></p>
+                        <p class="text-center p-1 m-0"><strong id="decline">0</strong> <br><small>Negative</small></p>
                     </div>
                 </div>
 
@@ -79,8 +114,12 @@
                     </ul>
                 </div>
                 <div class="col-12" id="topGainers"> </div>
+                <div class="col">
+                    <p class="text-center"><small>Source: onlinekhabar.com public data </small></p>
+                </div>
             </div>
         </div>
+
     </div>
     <script src="./popup.js"></script>
 </body>

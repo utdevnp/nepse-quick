@@ -10,7 +10,13 @@ const pointChange = document.getElementById("point_change");
 const nepseIcon = document.getElementById("nepseIcon");
 const topGainers = document.getElementById("topGainers");
 const gainerTab = document.getElementById("gainerTab");
-const loserTab = document.getElementById("loserTab")
+const loserTab = document.getElementById("loserTab");
+const script = document.getElementById("script");
+const actionType = document.getElementById("actionType");
+const price = document.getElementById("price");
+const addScript = document.getElementById("addScript");
+const watchListList = document.getElementById("watchListList");
+let myWatchItems = [];
 
 const API_URLS = {
     marketStatus: "https://www.onlinekhabar.com/smtm/home/market-status",
@@ -19,9 +25,60 @@ const API_URLS = {
     advancerDecliners: "https://www.onlinekhabar.com/smtm/home/advance-decline/nepse",
     nepse: "https://www.onlinekhabar.com/smtm/home/indices-data/nepse/1d"
 }
+
+addScript.addEventListener("click", () => {
+    const watchValue = JSON.parse(localStorage.getItem("watchList")) || [];
+
+    if (script.value && actionType.value && price.value) {
+        watchValue.push({
+            script: script.value,
+            actionType: actionType.value,
+            price: price.value
+        });
+    
+        localStorage.setItem("watchList", JSON.stringify(watchValue));
+    }
+    showWatchList();
+
+    script.value = "";
+    actionType.value = "Sell";
+    price.value = "";
+});
+
+
+
+const removeItem = (index) => {
+    const getItems = JSON.parse(localStorage.getItem("watchList"));
+    getItems.splice(index, 1);
+
+    localStorage.setItem("watchList", JSON.stringify(getItems));
+    showWatchList();
+}
+
+const showWatchList = async () => {
+    const getItems = JSON.parse(localStorage.getItem("watchList"));
+    const selectedFields = getItems.map((item, index) => ({
+        script: `<strong> ${item.script} </string>`,
+        actionType: item.actionType,
+        price: item.price,
+        action: `Up `,
+        delete: `<a  href='#'><i class="bi bi-trash2 removeScript" index-id='${index}' title='Remove'></i></a>`
+    }));
+
+    watchListList.innerHTML = "";
+    watchListList.appendChild(createTable(selectedFields));
+    myWatchItems = [...document.getElementsByClassName("removeScript")];
+    
+    myWatchItems.forEach((item) => {
+        item.addEventListener("click", (event) => {
+            removeItem(event.target.getAttribute("index-id"));
+        })
+    })
+}
+
 const oneDayTopGainers = async (isGainers = true) => {
     const result = await getData(isGainers ? API_URLS.oneDayTopGainers : API_URLS.oneDayTopLosers);
-    console.log("oneDayTopGainers", result);
+
     if (result.response && result.response.length) {
         const headers = ['Symbol', 'LTP', 'Pt Change', '% Change'];
         const latest10 = result.response.slice(0, 10);
@@ -84,7 +141,7 @@ const getData = async (url) => {
 
     return await response.json();
 }
-const createTable = (data, headers) => {
+const createTable = (data, headers = null) => {
     // Create the table element
     const table = document.createElement('table');
     table.classList.add("table");
@@ -99,13 +156,14 @@ const createTable = (data, headers) => {
     const headerRow = header.insertRow();
 
     // Add column headers
+    if (headers){
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+    }
    
-    headers.forEach(headerText => {
-        const th = document.createElement('th');
-        th.textContent = headerText;
-        headerRow.appendChild(th);
-    });
-
     // Create the table body
     const tbody = table.createTBody();
 
@@ -116,13 +174,13 @@ const createTable = (data, headers) => {
         // Create and insert data cells for each property
         Object.values(item).forEach(value => {
             const cell = row.insertCell();
-            cell.textContent = value;
+            cell.innerHTML = value;
         });
     });
 
     // Return the created table
     return table;
-} 
+}
 gainerTab.addEventListener("click", () => {
     gainerTab.classList.add("active");
     loserTab.classList.remove("active");
@@ -133,9 +191,10 @@ loserTab.addEventListener("click", () => {
     gainerTab.classList.remove("active");
     loserTab.classList.add("active");
     oneDayTopGainers(false);
-}); 
+});
 
 getMarketStatus();
 advancerDecliners();
 nepseOneDay();
 oneDayTopGainers();
+showWatchList();
