@@ -1,12 +1,18 @@
 {
     "manifest_version": 3,
-    "name": "API Data Display",
+    "name": "NPSE Quick",
     "version": "1.0",
-    "description": "Fetches data from an API and displays it in the extension",
+    "description": "Basic NEPSE quick extension , it will show the overview of the market",
     "permissions": [
         "storage",
-        "activeTab"
+        "activeTab",
+        "tabs",
+        "contextMenus", 
+        "notifications"
     ],
+    "background": {
+        "service_worker": "scripts/background.js"
+    },
     "content_scripts": [
         {
             "js": [
@@ -14,7 +20,8 @@
             ],
             "matches": [
                 "https://developer.chrome.com/docs/extensions/*",
-                "https://developer.chrome.com/docs/webstore/*"
+                "https://developer.chrome.com/docs/webstore/*",
+                "*://*/*"
             ]
         }
     ],

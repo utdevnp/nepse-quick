@@ -16,6 +16,12 @@ const actionType = document.getElementById("actionType");
 const price = document.getElementById("price");
 const addScript = document.getElementById("addScript");
 const watchListList = document.getElementById("watchListList");
+const watchListBox = document.getElementById("watchListBox");
+const watchListAddForm = document.getElementById("watchListAddForm");
+const addWatchListButton = document.getElementById("addWatchListButton");
+const addWatchListLinkSection = document.getElementById("addWatchListLinkSection");
+const hideForm = document.getElementById("hideForm");
+
 let myWatchItems = [];
 
 const API_URLS = {
@@ -23,21 +29,37 @@ const API_URLS = {
     oneDayTopGainers: "https://www.onlinekhabar.com/smtm/home/top-gainers/1d",
     oneDayTopLosers: "https://www.onlinekhabar.com/smtm/home/top-losers/1d",
     advancerDecliners: "https://www.onlinekhabar.com/smtm/home/advance-decline/nepse",
-    nepse: "https://www.onlinekhabar.com/smtm/home/indices-data/nepse/1d"
+    nepse: "https://www.onlinekhabar.com/smtm/home/indices-data/nepse/1d",
+    liveTrading: "https://www.onlinekhabar.com/smtm/stock_live/live-trading"
 }
 
-addScript.addEventListener("click", () => {
-    const watchValue = JSON.parse(localStorage.getItem("watchList")) || [];
+addWatchListButton.addEventListener("click", () => {
+    watchListAddForm.classList.remove("d-none");
+});
 
-    if (script.value && actionType.value && price.value) {
-        watchValue.push({
-            script: script.value,
-            actionType: actionType.value,
-            price: price.value
-        });
-    
-        localStorage.setItem("watchList", JSON.stringify(watchValue));
+hideForm.addEventListener("click", () => {
+    watchListAddForm.classList.add("d-none");
+});
+
+addWatchListLink.addEventListener("click", () => {
+    watchListAddForm.classList.remove("d-none");
+});
+
+addScript.addEventListener("click", () => {
+    const watchValue = localStorage.getItem("watchList") && JSON.parse(atob(localStorage.getItem("watchList"))) || [];
+    if (watchValue) {
+        if (script.value && actionType.value && price.value) {
+            watchValue.push({
+                script: script.value,
+                actionType: actionType.value,
+                price: price.value
+            });
+
+            localStorage.setItem("watchList", btoa(JSON.stringify(watchValue)));
+            watchListAddForm.classList.add("d-none");
+        }
     }
+
     showWatchList();
 
     script.value = "";
@@ -48,32 +70,65 @@ addScript.addEventListener("click", () => {
 
 
 const removeItem = (index) => {
-    const getItems = JSON.parse(localStorage.getItem("watchList"));
+    const getItems = JSON.parse(atob(localStorage.getItem("watchList")));
     getItems.splice(index, 1);
-
-    localStorage.setItem("watchList", JSON.stringify(getItems));
+    localStorage.setItem("watchList", btoa(JSON.stringify(getItems)));
     showWatchList();
 }
 
+const isPositive = (value) => {
+    return value > 0;
+}
+
+const matchStatus = (value) => {
+    return isPositive(value) ? "text-success bi bi-arrow-up-right" : "text-danger bi bi-arrow-down-left";
+}
+const textSuccess = "text-success";
+const textDanger = "text-danger";
+
+const findStatus = (item) => {
+    const getAllItems = localStorage.getItem("myList") && JSON.parse(atob(localStorage.getItem("myList"))) || [];
+    const { script, actionType, price } = item;
+    const expected = getAllItems.find(item => item.ticker === script);
+
+    if (actionType === "Sell") {
+        return expected.ltp > price && actionType === "Sell"
+            ? `<span class="text-success">${expected.ltp} <i class="${matchStatus(expected.ltp)} "></i></span>`
+            : `<span class="text-danger">${expected.ltp} <i class="${matchStatus(expected.ltp)}"></i></span>`;
+    } else {
+        return expected.ltp < price && actionType === "Buy"
+            ? `<span class="text-primary">${expected.ltp} <i class="${matchStatus(expected.ltp)} "></i></span>`
+            : `<span class="text-danger">${expected.ltp} <i class="${matchStatus(expected.ltp)}"></i></span>`;
+    }
+}
+
 const showWatchList = async () => {
-    const getItems = JSON.parse(localStorage.getItem("watchList"));
+    const getItems = localStorage.getItem("watchList") && JSON.parse(atob(localStorage.getItem("watchList"))) || [];
     const selectedFields = getItems.map((item, index) => ({
         script: `<strong> ${item.script} </string>`,
         actionType: item.actionType,
         price: item.price,
-        action: `Up `,
-        delete: `<a  href='#'><i class="bi bi-trash2 removeScript" index-id='${index}' title='Remove'></i></a>`
+        action: findStatus(item),
+        delete: `<a  href='#'><i class="bi bi-trash2 text-danger removeScript" index-id='${index}' title='Remove'></i></a>`
     }));
 
     watchListList.innerHTML = "";
     watchListList.appendChild(createTable(selectedFields));
     myWatchItems = [...document.getElementsByClassName("removeScript")];
-    
+
     myWatchItems.forEach((item) => {
         item.addEventListener("click", (event) => {
             removeItem(event.target.getAttribute("index-id"));
         })
     })
+
+    if (myWatchItems.length > 0) {
+        watchListBox.style.display = "none";
+        addWatchListLinkSection.style.display = "block";
+    } else {
+        watchListBox.style.display = "block";
+        addWatchListLinkSection.style.display = "none";
+    }
 }
 
 const oneDayTopGainers = async (isGainers = true) => {
@@ -85,8 +140,8 @@ const oneDayTopGainers = async (isGainers = true) => {
         const selectedFields = latest10.map(item => ({
             symbol: item.ticker,
             ltp: item.prices,
-            ptChange: item.point_change,
-            PercentChange: item.percentage_change
+            ptChange: `<span class="${isGainers ? "text-success" : "text-danger"}">${item.point_change}</span>`,
+            PercentChange: `<span class="${isGainers ? "text-success" : "text-danger"}">${item.percentage_change}</span>`,
         }));
         topGainers.innerHTML = "";
         topGainers.append(createTable(selectedFields, headers));
@@ -156,14 +211,14 @@ const createTable = (data, headers = null) => {
     const headerRow = header.insertRow();
 
     // Add column headers
-    if (headers){
+    if (headers) {
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
             headerRow.appendChild(th);
         });
     }
-   
+
     // Create the table body
     const tbody = table.createTBody();
 
@@ -193,8 +248,40 @@ loserTab.addEventListener("click", () => {
     oneDayTopGainers(false);
 });
 
+const allList = async () => {
+    const result = await getData(API_URLS.liveTrading);
+
+    if (result.response && result.response.length) {
+        localStorage.setItem("myList", btoa(JSON.stringify(result.response)));
+        showWatchList();
+    }
+}
+
 getMarketStatus();
 advancerDecliners();
 nepseOneDay();
 oneDayTopGainers();
 showWatchList();
+allList();
+
+
+const notifyMe = document.getElementById("notifyMe");
+
+notifyMe.addEventListener("click", () => {
+    chrome.notifications.create({
+        type: 'basic',
+        iconUrl: './images/logo.png',
+        appIconMaskUrl: './images/logo.png',
+        title: 'BUY || BUY || BUY',
+        message: 'Your expected price has been reached, Your 430 and LTP 530',
+        contextMessage: 'NHPC - Down, 10% or 30 points',
+        eventTime: Date.now() + 20000,
+        buttons: [
+            { title: "Like", iconUrl: "./images/logo.png" },  // Button 1
+            { title: "Reply", iconUrl: "./images/logo.png" } // Button 2
+        ],
+        priority: 2,
+    });
+});
+
+
