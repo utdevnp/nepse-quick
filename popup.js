@@ -48,7 +48,7 @@ addWatchListLink.addEventListener("click", () => {
 addScript.addEventListener("click", () => {
     const watchValue = localStorage.getItem("watchList") && JSON.parse(atob(localStorage.getItem("watchList"))) || [];
     if (watchValue) {
-        if (script.value && actionType.value && price.value) {
+        if (script.value && actionType.value && price.value > 0) {
             watchValue.push({
                 script: script.value,
                 actionType: actionType.value,
@@ -90,16 +90,22 @@ const findStatus = (item) => {
     const getAllItems = localStorage.getItem("myList") && JSON.parse(atob(localStorage.getItem("myList"))) || [];
     const { script, actionType, price } = item;
     const expected = getAllItems.find(item => item.ticker === script);
+    const expectedLtp = expected && expected.ltp || 0;
 
-    if (actionType === "Sell") {
-        return expected.ltp > price && actionType === "Sell"
-            ? `<span class="text-success">${expected.ltp} <i class="${matchStatus(expected.ltp)} "></i></span>`
-            : `<span class="text-danger">${expected.ltp} <i class="${matchStatus(expected.ltp)}"></i></span>`;
+    if (expected !== undefined) { 
+        if (actionType === "Sell") {
+            return expectedLtp > price && actionType === "Sell"
+                ? `<span class="text-success">${expectedLtp} <i class="${matchStatus(expectedLtp)} "></i></span>`
+                : `<span class="text-danger">${expectedLtp} <i class="${matchStatus(expectedLtp)}"></i></span>`;
+        } else  {
+            return expectedLtp < price && actionType === "Buy"
+                ? `<span class="text-primary">${expectedLtp} <i class="${matchStatus(expectedLtp)} "></i></span>`
+                : `<span class="text-danger">${expectedLtp} <i class="${matchStatus(expectedLtp)}"></i></span>`;
+        }
     } else {
-        return expected.ltp < price && actionType === "Buy"
-            ? `<span class="text-primary">${expected.ltp} <i class="${matchStatus(expected.ltp)} "></i></span>`
-            : `<span class="text-danger">${expected.ltp} <i class="${matchStatus(expected.ltp)}"></i></span>`;
+        return `Unknown`;
     }
+    
 }
 
 const showWatchList = async () => {
@@ -253,9 +259,13 @@ const allList = async () => {
 
     if (result.response && result.response.length) {
         localStorage.setItem("myList", btoa(JSON.stringify(result.response)));
+        const ssetMsg = await chrome.storage.local.set({ myList: btoa(JSON.stringify(result.response))});
+        console.log("ssetMsg", ssetMsg);
         showWatchList();
     }
 }
+
+
 
 getMarketStatus();
 advancerDecliners();
@@ -265,6 +275,7 @@ showWatchList();
 allList();
 
 
+
 const notifyMe = document.getElementById("notifyMe");
 
 notifyMe.addEventListener("click", () => {
@@ -272,9 +283,9 @@ notifyMe.addEventListener("click", () => {
         type: 'basic',
         iconUrl: './images/logo.png',
         appIconMaskUrl: './images/logo.png',
-        title: 'BUY || BUY || BUY',
+        title: 'BUY | BUY | BUY',
         message: 'Your expected price has been reached, Your 430 and LTP 530',
-        contextMessage: 'NHPC - Down, 10% or 30 points',
+        contextMessage: 'NHPC - Down by 10% or 30 points',
         eventTime: Date.now() + 20000,
         buttons: [
             { title: "Like", iconUrl: "./images/logo.png" },  // Button 1
