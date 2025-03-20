@@ -15,8 +15,7 @@ Tracking NEPSE stock movements in real time can be tedious. This extension simpl
 ## ⚡ Installation  
 ### Clone the Repository  
 ```sh  
-git clone https://github.com/utdevnp/nepse-quick.git
-cd nepse-quick  
+git clone https://github.com/utdevnp/nepse-quick.git 
 ```
 
 ### Load the Extension in Chrome  
