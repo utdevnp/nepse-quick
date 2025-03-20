@@ -11,10 +11,7 @@ Tracking NEPSE stock movements in real time can be tedious. This extension simpl
 - 📈 View top gainers and top losers in real time.  
 - 📊 Get an overview of the market with positive, negative, and unchanged stock counts.  
 - 🎯 Set your own target prices for buying and selling stocks.  
-- 🔄 Auto-refresh feature to keep data updated.  
-
-## 🔥 Try It Here  
-_(Add Chrome Web Store link here if published)_  
+- 🔄 Auto-refresh feature can be developed to keep data updated.  
 
 ## ⚡ Installation  
 ### Clone the Repository  
