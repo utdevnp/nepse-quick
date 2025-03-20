@@ -1,8 +1,7 @@
 
-# 🚀 NEPSE Quick View - Chrome Extension  
+## 🚀 NEPSE Quick View - Chrome Extension  
 
-## 📌 Description  
-NEPSE Quick View is a lightweight Chrome extension that provides real-time updates on the Nepal Stock Exchange (NEPSE). It includes a quick view of top gainers, top losers, and an overview of market trends (positive, negative, and unchanged stock counts). Additionally, users can set target buy and sell prices for their selected stocks.
+NEPSE Quick View is a lightweight Chrome extension that provides  updates on the Nepal Stock Exchange (NEPSE). It includes a quick view of top gainers, top losers, and an overview of market trends (positive, negative, and unchanged stock counts). Additionally, users can set target buy and sell prices for their selected stocks.
 
 ## 📖 Story Behind the Creation  
 Tracking NEPSE stock movements in real time can be tedious. This extension simplifies the process by giving traders a quick and efficient way to monitor stock trends and make informed decisions directly from their browser.
